@@ -1,28 +1,27 @@
 version: 0.2
 env:
- variables:
-     App_Env: "roduction"
-     Dept: "Engg."
-     Api_Url: "https://www.example.com
+  variables:
+    App_Env: "production"
+    Dept: "Engg."
+    Api_Url: "https://www.example.com"
 
- parameter-store:
-     USER: "DB_USER"
-     PWD: "DB_PASSWORD"
+  parameter-store:
+    USER: "DB_USER"
+    PWD: "DB_PASSWORD"
 
- secrets-manager:
-     DHUB: "DOCKER_LOGIN"
+  secrets-manager:
+    DHUB: "DOCKER_LOGIN"
 
 phases:
-   install:
-      commands:
-          - echo "Setting Up The Environment"
-   
-   build:
-     commands:
-         - echo "Environment: $App_Env"
-         - echo "Dept: $Dept"
-         - echo "Api_Url: $Api_Url"
-         - echo "DB-USER: $USER"
-         - echo "DB-PASSWORD: $PWD"
-         - echo "Docker_Cred: $DHUB" 
-     
+  install:
+    commands:
+      - echo "Setting Up The Environment"
+      
+  build:
+    commands:
+      - echo "Environment: $App_Env"
+      - echo "Dept: $Dept"
+      - echo "Api_Url: $Api_Url"
+      - echo "DB-USER: $USER"
+      - echo "DB-PASSWORD: $PWD"
+      - echo "Docker_Cred: $DHUB"
