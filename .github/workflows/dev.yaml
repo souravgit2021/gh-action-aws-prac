@@ -1,0 +1,10 @@
+name: dev pipeline
+on: workflow_dispatch
+
+jobs:
+  deploy:
+     runs-on: ubuntu-latest
+     environment: Dev
+     steps:
+        - name: Printing The Dev env Vars
+          run: echo "Env Is: ${{ vars.ENVIRONMENT }}"
