@@ -7,4 +7,4 @@ jobs:
      environment: Test
      steps:
         - name: Printing The Test env Vars
-          run: echo "Env Is: ${{ vars.ENVIRONMENT }}"
+          run:  echo "The Env is = ${{ vars.ENVIRONMENT }}"
