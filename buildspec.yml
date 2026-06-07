@@ -29,7 +29,7 @@ phases:
       - 'echo "Docker_Cred: $DHUB"'
       
       - echo Build started on `date`
-      - mvn --batch-mode --update-snapshots verify
+      - mvn -DskipTests verify
 
 cache:
    paths:
