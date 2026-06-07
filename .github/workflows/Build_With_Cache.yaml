@@ -3,18 +3,27 @@ on: workflow_dispatch
 
 jobs:
   Dependency_Cache:
-           runs-on: ubuntu-latest
-           steps:
-            - name: CheckOut Code
-              uses: actions/checkout@v4 
-            
-            - name: Cache Maven packages
-              uses: actions/cache@v4
-              with:
-                  path: ~/.m2/repository
-                  key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-                  restore-keys: |
-                     ${{ runner.os }}-maven-
+    runs-on: ubuntu-latest
+    steps:
+      - name: CheckOut Code
+        uses: actions/checkout@v4 
+      
+      # CRITICAL ADDITION: Java must be installed before running Maven
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          # Note: We leave native caching off here since you are using explicit actions/cache below
 
-            - name: Build With Maven
-              run: mvn verify 
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      # OPTIMIZED: Added CI/CD flags to keep your logs clean and non-interactive
+      - name: Build With Maven
+        run: mvn --batch-mode --update-snapshots verify
