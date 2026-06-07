@@ -14,6 +14,8 @@ env:
 
 phases:
   install:
+    runtime-versions:
+         java: corretto21
     commands:
       - echo "Setting Up The Environment"
       
@@ -25,3 +27,11 @@ phases:
       - 'echo "DB-USER: $USER"'
       - 'echo "DB-PASSWORD: $PWD"'
       - 'echo "Docker_Cred: $DHUB"'
+      
+      - echo Build started on `date`
+      - mvn --batch-mode --update-snapshots verify
+
+cache:
+   paths:
+      - '/root/.m2/**/*' 
+
