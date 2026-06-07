@@ -1,0 +1,17 @@
+name: SPC Build With Dependency Cache Management
+on: workflow_dispatch
+
+jobs:
+  Dependency_Cache:
+           runs-on: ubuntu-latest
+           steps:
+             - name: Cache Maven packages
+               uses: actions/cache@v4
+               with:
+                  path: ~/.m2/repository
+                  key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+                  restore-keys: |
+                     ${{ runner.os }}-maven-
+
+             - name: Build With Maven
+               run: mvn verify 
