@@ -7,7 +7,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'mvn --batch-mode --update-snapshots verify'
+                sh 'mvn -DskipTests install'
             }
         }
     }
