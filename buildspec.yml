@@ -29,7 +29,17 @@ phases:
       - 'echo "Docker_Cred: $DHUB"'
       
       - echo Build started on `date`
-      - mvn -DskipTests verify
+      - mvn -DskipTests clean install
+
+  post_build:
+      - echo "Verifying the artifact exists on the local path..."
+      - ls -la ${CODEBUILD_SRC_DIR}/target
+
+artifacts:
+    files:
+       - 'target/*.jar'
+    name: build-artifact-{CODEBUILD_BUILD_NUMBER}
+    discard-path: yes
 
 cache:
    paths:
