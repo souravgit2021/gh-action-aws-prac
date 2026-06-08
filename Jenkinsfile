@@ -7,7 +7,20 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'mvn clean verify -Dcheckstyle.skip'
+                sh 'mvn clean install -Dcheckstyle.skip'
+            }
+        }
+
+        stage("Verify Local Files"){
+            steps{
+                echo "Verifying local path contents..."
+                sh 'ls -la target/'
+            }
+        }
+
+        stage("Archiving Artifacts"){
+            steps{
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true, allowEmptyArchive: false
             }
         }
     }
