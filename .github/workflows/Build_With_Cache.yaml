@@ -27,3 +27,10 @@ jobs:
       # OPTIMIZED: Added CI/CD flags to keep your logs clean and non-interactive
       - name: Build With Maven
         run: mvn --batch-mode --update-snapshots verify
+
+      - name: Archive and Upload build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: spc-jar
+          path: target/*.jar
+          retention-days: 30
