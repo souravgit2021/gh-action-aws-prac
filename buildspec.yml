@@ -22,7 +22,7 @@ phases:
   build:
     commands:
       - 'echo "Environment: $App_Env"'
-      - 'echo "Dept: $Dept"'
+      - 'dept: $Dept'
       - 'echo "Api_Url: $Api_Url"'
       - 'echo "DB-USER: $USER"'
       - 'echo "DB-PASSWORD: $PWD"'
@@ -32,16 +32,16 @@ phases:
       - mvn -DskipTests clean install
 
   post_build:
+    commands: # Added missing commands key here
       - echo "Verifying the artifact exists on the local path..."
       - ls -la ${CODEBUILD_SRC_DIR}/target
 
 artifacts:
     files:
        - 'target/*.jar'
-    name: build-artifact-{CODEBUILD_BUILD_NUMBER}
-    discard-path: yes
+    name: build-artifact-${CODEBUILD_BUILD_NUMBER} # Fixed missing $ symbol
+    discard-paths: yes # Fixed missing 's' in discard-paths
 
 cache:
    paths:
-      - '/root/.m2/**/*' 
-
+      - '/root/.m2/**/*'
