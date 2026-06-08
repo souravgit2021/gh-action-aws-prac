@@ -21,13 +21,11 @@ phases:
       
   build:
     commands:
-      - 'echo "Environment: $App_Env"'
-      - 'dept: $Dept'
-      - 'echo "Api_Url: $Api_Url"'
-      - 'echo "DB-USER: $USER"'
-      - 'echo "DB-PASSWORD: $PWD"'
-      - 'echo "Docker_Cred: $DHUB"'
-      
+      # - 'echo "Environment: $App_Env"'
+      # - 'echo "Api_Url: $Api_Url"'
+      # - 'echo "DB-USER: $USER"'
+      # - 'echo "DB-PASSWORD: $PWD"'
+      # - 'echo "Docker_Cred: $DHUB"'      
       - echo Build started on `date`
       - mvn -DskipTests clean install
 
