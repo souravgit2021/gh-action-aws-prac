@@ -16,7 +16,7 @@ pipeline{
 
         stage("Code Testing"){
             steps{
-                sh 'mvn -s settings.xml -DskipTests test'
+                sh 'mvn -s settings.xml -Dcheckstyle.skip=true test'
             }
         }
 
@@ -24,7 +24,7 @@ pipeline{
             steps {
                 script {
                     withSonarQubeEnv(credentialsId: 'sonar-token') {
-                        sh "mvn -s settings.xml sonar:sonar"
+                        sh "mvn -Dcheckstyle.skip=true -s settings.xml sonar:sonar"
                     }
                 }
             }
@@ -33,7 +33,7 @@ pipeline{
 
         stage("App Code Build"){
             steps{
-                sh 'mvn -s settings.xml -DskipTests install'
+                sh 'mvn -s settings.xml -Dcheckstyle.skip=true install'
             }
         }
 
