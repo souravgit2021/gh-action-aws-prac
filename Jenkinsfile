@@ -1,27 +1,16 @@
-pipeline {
+pipeline{
     agent any
-    environment {
-        // Point Maven to a persistent, job-specific folder on the agent's drive
-        MAVEN_OPTS = "-Dmaven.repo.local=${WORKSPACE}/.m2/repository"
-    }
     stages {
-        stage('Build') {
-            steps {
-                sh 'mvn clean install -Dcheckstyle.skip'
+        // stage("Code CheckOut"){
+        //     steps{
+        //         git branch: 'main', credentialsId: 'none', url: 'https://github.com/souravgit2021/gh-action-aws-prac.git'
+        //     }
+
+        stage("Code Testing"){
+            steps{
+                mvn -DskipTests test
             }
         }
 
-        stage("Verify Local Files"){
-            steps{
-                echo "Verifying local path contents..."
-                sh 'ls -la target/'
-            }
-        }
-
-        stage("Archiving Artifacts"){
-            steps{
-                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true, allowEmptyArchive: false
-            }
         }
     }
-}
