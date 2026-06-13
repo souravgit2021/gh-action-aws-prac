@@ -56,6 +56,20 @@ pipeline{
             }
         }
 
+        stage('Trivy Security Scan') {
+            steps {
+                script {
+                    // 1. Run a scan to print standard table output in the Jenkins console logs
+                    sh "trivy image --severity HIGH,CRITICAL {DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
+                    
+                    // 2. Optional: Generate a JSON report to archive as an artifact
+                    sh "trivy image --format json --output trivy-report.json {DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
+                }
+            }
+        }
+
+        
+
         stage('Push to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: "${DOCKER_CRED_ID}", 
@@ -81,7 +95,14 @@ pipeline{
             }
         }
 
+    }
 
-
+    post {
+        always {
+            // Archive the generated scan report inside Jenkins
+            archiveArtifacts artifacts: 'trivy-report.json', allowEmptyArchive: true
         }
     }
+    
+
+}
