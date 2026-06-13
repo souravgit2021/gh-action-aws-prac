@@ -20,6 +20,17 @@ pipeline{
             }
         }
 
+        stage("Sonarqube Analysis") {
+            steps {
+                script {
+                    withSonarQubeEnv(credentialsId: 'sonar-token') {
+                        sh "mvn sonar:sonar"
+                    }
+                }
+            }
+
+        }
+
         stage("App Code Build"){
             steps{
                 sh 'mvn -DskipTests install'
