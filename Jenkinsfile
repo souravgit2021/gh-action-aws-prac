@@ -68,7 +68,7 @@ pipeline{
         stage('Removing The Local Docker Image'){
             steps{
                 sh 'docker image rm ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}'
-                // sh 'docker image rm ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest"'
+                sh 'docker image rm ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest"'
 
             }
         }
