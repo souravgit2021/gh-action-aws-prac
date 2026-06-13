@@ -18,7 +18,7 @@
   </servers>
   <mirrors>
   <mirror>
-    <id>qwerty_test</id>
+    <id>maven-snapshots</id>
     <mirrorOf>*</mirrorOf>
     <url>http://172.31.41.240:8081/repository/maven-releases/</url>
   </mirror>
