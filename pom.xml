@@ -14,6 +14,20 @@
 
   <name>petclinic</name>
 
+  <distributionManagement>
+    <repository>
+        <id>maven-releases</id>
+        <name>Release</name>
+        <url>http://172.31.41.240:8081/repository/maven-releases/</url>
+    </repository>
+    <snapshotRepository>
+        <id>maven-snapshots</id>
+        <name>Snapshot</name>
+        <url>http://172.31.41.240:8081/repository/maven-snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
+
+
   <properties>
     <!-- Generic properties -->
     <java.version>17</java.version>

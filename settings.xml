@@ -1,0 +1,26 @@
+<settings>
+  <servers>
+    <server>
+      <id>maven-releases</id>
+      <username>admin</username>
+      <password>admin123</password>
+    </server>
+    <server>
+      <id>maven-snapshots</id>
+      <username>admin</username>
+      <password>admin123</password>
+    </server>
+    <!-- <server>
+      <id>qwerty_test</id>
+      <username>sourav</username>
+      <password>redhat</password>
+    </server> -->
+  </servers>
+  <mirrors>
+  <mirror>
+    <id>qwerty_test</id>
+    <mirrorOf>*</mirrorOf>
+    <url>http://172.31.41.240:8081/repository/maven-releases/</url>
+  </mirror>
+  </mirrors>
+</settings>

@@ -16,7 +16,7 @@ pipeline{
 
         stage("Code Testing"){
             steps{
-                sh 'mvn -DskipTests test'
+                sh 'mvn -s settings.xml -DskipTests test'
             }
         }
 
@@ -24,7 +24,7 @@ pipeline{
             steps {
                 script {
                     withSonarQubeEnv(credentialsId: 'sonar-token') {
-                        sh "mvn sonar:sonar"
+                        sh "mvn -s settings.xml sonar:sonar"
                     }
                 }
             }
@@ -33,8 +33,16 @@ pipeline{
 
         stage("App Code Build"){
             steps{
-                sh 'mvn -DskipTests install'
+                sh 'mvn -s settings.xml -DskipTests install'
             }
+        }
+
+
+        stage('upload to nexus') {
+            steps {
+                sh 'pwd'
+                nexusArtifactUploader artifacts: [[artifactId: 'spring-petclinic', classifier: '', file: 'spring-petclinic/target/spring-petclinic-4.0.0-SNAPSHOT.jar', type: '.jar']], credentialsId: 'nexus-login', groupId: 'org.springframework.samples', nexusUrl: '172.31.41.240:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'maven-snapshots', version: '4.0.0-SNAPSHOT'
+           }
         }
 
 
