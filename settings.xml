@@ -10,6 +10,14 @@
       <username>admin</username>
       <password>admin123</password>
     </server>
+    <server>
+      <id>maven-central</id>
+      <username>admin</username>
+      <password>admin123</password>
+    </server>
+    
+    
+    
     <!-- <server>
       <id>qwerty_test</id>
       <username>sourav</username>
@@ -19,7 +27,7 @@
   <mirrors>
   <mirror>
     <id>maven-central</id>
-    <mirrorOf>*</mirrorOf>
+    <mirrorOf>*,!maven-releases,!maven-snapshots</mirrorOf>
     <url>http://172.31.41.240:8081/repository/maven-central/</url>
   </mirror>
   </mirrors>
