@@ -18,9 +18,9 @@
   </servers>
   <mirrors>
   <mirror>
-    <id>maven-snapshots</id>
+    <id>maven-central</id>
     <mirrorOf>*</mirrorOf>
-    <url>http://172.31.41.240:8081/repository/maven-snapshots/</url>
+    <url>http://172.31.41.240:8081/repository/maven-central/</url>
   </mirror>
   </mirrors>
 </settings>
