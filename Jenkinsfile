@@ -11,7 +11,7 @@ pipeline{
         IMAGE_TAG       = "${env.BUILD_NUMBER}"
         DOCKER_CRED_ID  = 'docker-hub-credentials' 
         GITHUB_CREDS = credentials('git-login')
-        REPO_URL     = 'https://github.com/souravgit2021/gitops-springpetclinic.git'
+        REPO_URL     = 'github.com/souravgit2021/gitops-springpetclinic.git'
         BRANCH       = 'main' 
     }
 
@@ -113,7 +113,7 @@ pipeline{
                 // Safely clones the repository using your credentials
                 git branch: "${BRANCH}", 
                     credentialsId: 'git-login', 
-                    url: "${REPO_URL}"
+                    url: "https://${REPO_URL}"
             }
         }
 
@@ -137,7 +137,7 @@ pipeline{
                     
                     // Stage and commit the changed deployment file
                     sh "git add deployment.yaml"
-                    sh "git commit -m 'chore: automated deployment file update [skip ci]'"
+                    sh "git commit -m 'automated deployment file update [skip ci]'"
                     
                     // Push back to GitHub using securely injected credentials
                     sh "git push https://${GITHUB_CREDS_USR}:${GITHUB_CREDS_PSW}@${REPO_URL} HEAD:${BRANCH}"
