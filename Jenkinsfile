@@ -120,7 +120,7 @@ pipeline{
         stage('Modify Deployment File') {
             steps {
                 script {
-                    sh "cd gitops-springpetclinic"
+                    // sh "cd gitops-springpetclinic"
                     sh "sed -i 's|^.*image:.*\$|      image: ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}|' deployment.yaml"
                 }
             }
