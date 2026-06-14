@@ -31,6 +31,16 @@ pipeline{
 
         }
 
+
+        stage("Quality Gate") {
+            steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token'
+                }
+            }
+
+        }
+
         stage("App Code Build"){
             steps{
                 sh 'mvn -s settings.xml -Dcheckstyle.skip=true install'
