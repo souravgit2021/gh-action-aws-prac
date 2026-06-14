@@ -11,7 +11,7 @@ pipeline{
         IMAGE_TAG       = "${env.BUILD_NUMBER}"
         DOCKER_CRED_ID  = 'docker-hub-credentials' 
         GITHUB_CREDS = credentials('git-login')
-        REPO_URL     = 'https://github.com/souravgit2021/gh-action-aws-prac.git'
+        REPO_URL     = 'https://github.com/souravgit2021/gitops-springpetclinic.git'
         BRANCH       = 'main' 
     }
 
@@ -120,8 +120,7 @@ pipeline{
         stage('Modify Deployment File') {
             steps {
                 script {
-                    // Update a image tag or variable in your deployment file (e.g., deployment.yaml)
-                    // This replaces 'old-value' with 'new-value' inside the file
+                    sh "cd gitops-springpetclinic"
                     sh "sed -i 's|^.*image:.*\$|      image: ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}|' deployment.yaml"
                 }
             }
