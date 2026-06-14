@@ -10,6 +10,9 @@ pipeline{
         IMAGE_NAME      = 'spring_pet_clinic'
         IMAGE_TAG       = "${env.BUILD_NUMBER}"
         DOCKER_CRED_ID  = 'docker-hub-credentials' 
+        GITHUB_CREDS = credentials('git-login')
+        REPO_URL     = 'https://github.com/souravgit2021/gh-action-aws-prac.git'
+        BRANCH       = 'main' 
     }
 
     stages {
@@ -102,6 +105,43 @@ pipeline{
                 sh 'docker image rm ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}'
                 sh 'docker image rm ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest'
 
+            }
+        }
+
+        stage('Checkout Code') {
+            steps {
+                // Safely clones the repository using your credentials
+                git branch: "${BRANCH}", 
+                    credentialsId: 'git-login', 
+                    url: "${REPO_URL}"
+            }
+        }
+
+        stage('Modify Deployment File') {
+            steps {
+                script {
+                    // Update a image tag or variable in your deployment file (e.g., deployment.yaml)
+                    // This replaces 'old-value' with 'new-value' inside the file
+                    sh "sed -i 's|^.*image:.*\$|      image: ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}|' deployment.yaml"
+                }
+            }
+        }
+
+
+        stage('Push Changes to GitHub') {
+            steps {
+                script {
+                    // Configure temporary git identity for the commit
+                    sh "git config user.name 'Sourav Biswas'"
+                    sh "git config user.email 'Sourav@mail.com'"
+                    
+                    // Stage and commit the changed deployment file
+                    sh "git add deployment.yaml"
+                    sh "git commit -m 'chore: automated deployment file update [skip ci]'"
+                    
+                    // Push back to GitHub using securely injected credentials
+                    sh "git push https://${GITHUB_CREDS_USR}:${GITHUB_CREDS_PSW}@${REPO_URL} HEAD:${BRANCH}"
+                }
             }
         }
 
