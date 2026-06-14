@@ -121,6 +121,7 @@ pipeline{
             steps {
                 script {
                     // sh "cd gitops-springpetclinic"
+                    sh "ls -l"
                     sh "sed -i 's|^.*image:.*\$|      image: ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}|' deployment.yaml"
                 }
             }
