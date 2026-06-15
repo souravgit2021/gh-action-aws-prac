@@ -185,6 +185,31 @@ pipeline {
             }
         }
 
+
+
+        stage('Deploy to Amazon ECS') {
+    environment {
+        AWS_DEFAULT_REGION = 'us-east-2'
+        ECS_CLUSTER_NAME   = 'superb-gecko-tukddh'
+        ECS_SERVICE_NAME   = 'spc-jenkins-cicd-service-4iz15544'
+    }
+    steps {
+        script {
+            // Forces ECS to pull the latest image and perform a rolling update
+            sh """
+                aws ecs update-service \
+                    --cluster ${ECS_CLUSTER_NAME} \
+                    --service ${ECS_SERVICE_NAME} \
+                    --force-new-deployment \
+                    --region ${AWS_DEFAULT_REGION}
+            """
+                }
+            }
+        }
+
+
+
+
     }
 
     post {
