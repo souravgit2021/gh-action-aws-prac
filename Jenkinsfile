@@ -12,7 +12,16 @@ pipeline{
         DOCKER_CRED_ID  = 'docker-hub-credentials' 
         GITHUB_CREDS = credentials('git-login')
         REPO_URL     = 'github.com/souravgit2021/gitops-springpetclinic.git'
-        BRANCH       = 'main' 
+        BRANCH       = 'main'
+
+        AWS_REGISTRY_ID  = '102512866166' // Your 12-digit AWS Account ID
+        AWS_REGION       = 'us-east-2'     // Your target AWS Region
+        ECR_REPO_NAME    = 'spc-app'   // Your Amazon ECR Repository Name
+        
+        // Formulated Variables
+        ECR_REGISTRY_URI = "${AWS_REGISTRY_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+        IMAGE_URI        = "${ECR_REGISTRY_URI}/${ECR_REPO_NAME}"
+        IMAGE_TAG        = "${BUILD_NUMBER}" // Uses Jenkins build number as unique tag
     }
 
     stages {
@@ -100,10 +109,60 @@ pipeline{
             }
         }
 
+        stage('Docker Login to AWS ECR') {
+            steps {
+                // Injects your AWS keys safely into the stage scope
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding', 
+                    credentialsId: 'aws-credentials-id', 
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                ]]) {
+                    script {
+                        // Generates an authorization token and pipes it into Docker login
+                        sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY_URI}"
+                    }
+                }
+            }
+        }
+
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // Builds the image locally using the current workspace context
+                    sh "docker build -t ${ECR_REPO_NAME}:${IMAGE_TAG} ."
+                }
+            }
+        }
+
+         stage('Tag Docker Image') {
+            steps {
+                script {
+                    // Tags local build with ECR naming patterns
+                    sh "docker tag ${ECR_REPO_NAME}:${IMAGE_TAG} ${IMAGE_URI}:${IMAGE_TAG}"
+                    sh "docker tag ${ECR_REPO_NAME}:${IMAGE_TAG} ${IMAGE_URI}:latest"
+                }
+            }
+        }
+
+        stage('Push Image to Amazon ECR') {
+            steps {
+                script {
+                    // Pushes both the build-versioned tag and the latest tag to ECR
+                    sh "docker push ${IMAGE_URI}:${IMAGE_TAG}"
+                    sh "docker push ${IMAGE_URI}:latest"
+                }
+            }
+        }
+
         stage('Removing The Local Docker Image'){
             steps{
                 sh 'docker image rm ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}'
                 sh 'docker image rm ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest'
+                sh "docker rmi ${ECR_REPO_NAME}:${IMAGE_TAG} || true"
+                sh "docker rmi ${IMAGE_URI}:${IMAGE_TAG} || true"
+                sh "docker rmi ${IMAGE_URI}:latest || true"
 
             }
         }
