@@ -1,4 +1,4 @@
-pipeline{
+pipeline {
     agent any
     tools {
         maven 'MVN3.9'
@@ -6,22 +6,21 @@ pipeline{
     }
 
     environment {
-        DOCKER_HUB_USER = 'docsourav1992'
-        IMAGE_NAME      = 'spring_pet_clinic'
-        IMAGE_TAG       = "${env.BUILD_NUMBER}"
-        DOCKER_CRED_ID  = 'docker-hub-credentials' 
-        GITHUB_CREDS = credentials('git-login')
-        REPO_URL     = 'github.com/souravgit2021/gitops-springpetclinic.git'
-        BRANCH       = 'main'
+        DOCKER_HUB_USER  = 'docsourav1992'
+        IMAGE_NAME       = 'spring_pet_clinic'
+        IMAGE_TAG        = "${env.BUILD_NUMBER}" // Standardized single definition
+        DOCKER_CRED_ID   = 'docker-hub-credentials' 
+        GITHUB_CREDS     = credentials('git-login')
+        REPO_URL         = 'github.com/souravgit2021/gitops-springpetclinic.git'
+        BRANCH           = 'main'
 
         AWS_REGISTRY_ID  = '102512866166' // Your 12-digit AWS Account ID
         AWS_REGION       = 'us-east-2'     // Your target AWS Region
-        ECR_REPO_NAME    = 'spc-app'   // Your Amazon ECR Repository Name
+        ECR_REPO_NAME    = 'spc-app'       // Your Amazon ECR Repository Name
         
         // Formulated Variables
         ECR_REGISTRY_URI = "${AWS_REGISTRY_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
         IMAGE_URI        = "${ECR_REGISTRY_URI}/${ECR_REPO_NAME}"
-        IMAGE_TAG        = "${BUILD_NUMBER}" // Uses Jenkins build number as unique tag
     }
 
     stages {
@@ -40,9 +39,7 @@ pipeline{
                     }
                 }
             }
-
         }
-
 
         stage("Quality Gate") {
             steps {
@@ -50,7 +47,6 @@ pipeline{
                     waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token'
                 }
             }
-
         }
 
         stage("App Code Build"){
@@ -59,7 +55,6 @@ pipeline{
             }
         }
 
-
         stage('upload to nexus') {
             steps {
                 sh 'pwd'
@@ -67,8 +62,7 @@ pipeline{
            }
         }
 
-
-        stage('Build Docker Image') {
+        stage('Build Docker Hub Image') { // Renamed to ensure uniqueness
             steps {
                 script {
                     echo "Building image: ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
@@ -89,8 +83,6 @@ pipeline{
                 }
             }
         }
-
-        
 
         stage('Push to Docker Hub') {
             steps {
@@ -126,8 +118,7 @@ pipeline{
             }
         }
 
-
-        stage('Build Docker Image') {
+        stage('Build ECR Docker Image') { // Renamed to ensure uniqueness
             steps {
                 script {
                     // Builds the image locally using the current workspace context
@@ -163,7 +154,6 @@ pipeline{
                 sh "docker rmi ${ECR_REPO_NAME}:${IMAGE_TAG} || true"
                 sh "docker rmi ${IMAGE_URI}:${IMAGE_TAG} || true"
                 sh "docker rmi ${IMAGE_URI}:latest || true"
-
             }
         }
 
@@ -179,13 +169,11 @@ pipeline{
         stage('Modify Deployment File') {
             steps {
                 script {
-                    // sh "cd gitops-springpetclinic"
                     sh "ls -l"
                     sh "sed -i 's|^.*image:.*\$|      image: ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}|' deployment.yaml"
                 }
             }
         }
-
 
         stage('Push Changes to GitHub') {
             steps {
@@ -212,6 +200,4 @@ pipeline{
             archiveArtifacts artifacts: 'trivy-report.json', allowEmptyArchive: true
         }
     }
-    
-
 }
