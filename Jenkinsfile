@@ -103,16 +103,9 @@ pipeline {
 
         stage('Docker Login to AWS ECR') {
             steps {
-                // Injects your AWS keys safely into the stage scope
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding', 
-                    credentialsId: 'aws-credentials-id', 
-                    accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
-                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-                ]]) {
+               {
                     script {
-                        // Generates an authorization token and pipes it into Docker login
-                        sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY_URI}"
+                        sh 'aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 102512866166.dkr.ecr.us-east-2.amazonaws.com'
                     }
                 }
             }
