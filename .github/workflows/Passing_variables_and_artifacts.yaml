@@ -1,0 +1,20 @@
+name: Pass Variables Example
+on: workflow_dispatch
+
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+       - name: Generate A Value
+         id: set_var
+         run: echo "my_value=HellowFromJob1" >> $GITHUB_OUTPUT
+
+    outputs:
+        my_shared_var: ${{steps.set_var.outputs.my_value}}
+  
+  job2:
+    needs: job1
+    runs-on: ubuntu-latest
+    steps:
+      - name: use the variable
+        run: echo "The value received is ${{ needs.job1.outputs.my_shared_var }}" 
