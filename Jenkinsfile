@@ -101,6 +101,51 @@ pipeline {
             }
         }
 
+        
+        stage('Checkout Code For GitOps') {
+            steps {
+                // Safely clones the repository using your credentials
+                git branch: "${BRANCH}", 
+                    credentialsId: 'git-login', 
+                    url: "https://${REPO_URL}"
+            }
+        }
+
+        stage('Modify Deployment File') {
+            steps {
+                script {
+                    sh "ls -l"
+                    // sh "sed -i 's|^.*image:.*\$|      image: ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}|' deployment.yaml"
+                    sh "sed -i 's|IMAGE_PLACEHOLDER|${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}|' deployment.yaml"
+                }
+            }
+        }
+
+        stage('Push Changes to GitHub') {
+            steps {
+                script {
+                    // Configure temporary git identity for the commit
+                    sh "git config user.name 'Sourav Biswas'"
+                    sh "git config user.email 'Sourav@mail.com'"
+                    
+                    // Stage and commit the changed deployment file
+                    sh "git add deployment.yaml"
+                    sh "git commit -m 'automated deployment file update [skip ci]'"
+                    
+                    // Push back to GitHub using securely injected credentials
+                    sh "git push https://${GITHUB_CREDS_USR}:${GITHUB_CREDS_PSW}@${REPO_URL} HEAD:${BRANCH}"
+                }
+            }
+        }
+        
+        
+        stage("Deploy To ECR And ECS"){
+            steps{
+                input message ("Are We Good To Deploy ECS Prod")
+            }
+        }
+        
+        
         stage('Docker Login to AWS ECR') {
             steps 
                {
@@ -150,40 +195,7 @@ pipeline {
             }
         }
 
-        stage('Checkout Code') {
-            steps {
-                // Safely clones the repository using your credentials
-                git branch: "${BRANCH}", 
-                    credentialsId: 'git-login', 
-                    url: "https://${REPO_URL}"
-            }
-        }
-
-        stage('Modify Deployment File') {
-            steps {
-                script {
-                    sh "ls -l"
-                    sh "sed -i 's|^.*image:.*\$|      image: ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}|' deployment.yaml"
-                }
-            }
-        }
-
-        stage('Push Changes to GitHub') {
-            steps {
-                script {
-                    // Configure temporary git identity for the commit
-                    sh "git config user.name 'Sourav Biswas'"
-                    sh "git config user.email 'Sourav@mail.com'"
-                    
-                    // Stage and commit the changed deployment file
-                    sh "git add deployment.yaml"
-                    sh "git commit -m 'automated deployment file update [skip ci]'"
-                    
-                    // Push back to GitHub using securely injected credentials
-                    sh "git push https://${GITHUB_CREDS_USR}:${GITHUB_CREDS_PSW}@${REPO_URL} HEAD:${BRANCH}"
-                }
-            }
-        }
+        
 
 
 
