@@ -23,7 +23,7 @@ jobs:
      runs-on: ubuntu-latest
      steps:
         - name: Create A Dummy Build Asset
-          run: 
+          run: |
             mkdir -p build_output
             echo "Build PayLoad Data" > build_output/app.bin
         
