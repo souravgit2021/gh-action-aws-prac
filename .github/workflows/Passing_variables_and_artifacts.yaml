@@ -4,13 +4,13 @@ on: workflow_dispatch
 jobs:
   job1:
     runs-on: ubuntu-latest
+    # FIXED: Moved outputs to the job level, aligned with runs-on
+    outputs:
+      my_shared_var: ${{ steps.set_var.outputs.my_value }}
     steps:
        - name: Generate A Value
          id: set_var
          run: echo "my_value=HellowFromJob1" >> $GITHUB_OUTPUT
-
-    outputs:
-        my_shared_var: ${{steps.set_var.outputs.my_value}}
   
   job2:
     needs: job1
@@ -31,7 +31,8 @@ jobs:
           uses: actions/upload-artifact@v4
           with:
             name: compiled-binary-asset
-            path: build/output/app.bin
+            # FIXED: Path now matches the directory created above
+            path: build_output/app.bin
 
   deploy_job:
     needs: build_job
@@ -45,5 +46,3 @@ jobs:
 
        - name: Verify The Received File
          run: cat extracted_output/app.bin
-
-
