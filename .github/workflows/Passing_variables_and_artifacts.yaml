@@ -40,7 +40,7 @@ jobs:
        - name: Download The Asset
          uses: actions/download-artifact@v4
          with: 
-            name: compiled-binary-asse
+            name: compiled-binary-asset
             path: extracted_output/
 
        - name: Verify The Received File
