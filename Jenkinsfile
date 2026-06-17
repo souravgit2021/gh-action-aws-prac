@@ -67,6 +67,8 @@ pipeline {
                     echo "Building image: ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
                     sh "docker build -t ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG} ."
                     sh "docker tag ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest"
+                    sh "docker tag ${ECR_REPO_NAME}:${IMAGE_TAG} ${IMAGE_URI}:${IMAGE_TAG}"
+                    sh "docker tag ${ECR_REPO_NAME}:${IMAGE_TAG} ${IMAGE_URI}:latest"
                 }
             }
         }
@@ -147,24 +149,7 @@ pipeline {
             }
         }
 
-        stage('Build ECR Docker Image') { 
-            steps {
-                script {
-                    sh "pwd;ls -l"
-                    sh "docker build -t ${ECR_REPO_NAME}:${IMAGE_TAG} ."
-                }
-            }
-        }
-
-         stage('Tag Docker Image') {
-            steps {
-                script {
-                    sh "docker tag ${ECR_REPO_NAME}:${IMAGE_TAG} ${IMAGE_URI}:${IMAGE_TAG}"
-                    sh "docker tag ${ECR_REPO_NAME}:${IMAGE_TAG} ${IMAGE_URI}:latest"
-                }
-            }
-        }
-
+        
         stage('Push Image to Amazon ECR') {
             steps {
                 script {
