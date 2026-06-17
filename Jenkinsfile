@@ -140,8 +140,8 @@ pipeline {
         
         
         stage("Deploy To ECR And ECS"){
-            steps{
-                input message ("Are We Good To Deploy ECS Prod")
+            input {
+                message: "Are We Good To Deploy To Production"
             }
         }
         
