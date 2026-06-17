@@ -187,7 +187,7 @@ pipeline {
             environment {
                 AWS_DEFAULT_REGION = 'us-east-2'
                 ECS_CLUSTER_NAME   = 'superb-gecko-tukddh'
-                ECS_SERVICE_NAME   = 'spc-jenkins-cicd-service-4iz15544'
+                ECS_SERVICE_NAME   = 'spc-jenkins-cicd-service-les28lsx'
             }
             steps {
                 script {
