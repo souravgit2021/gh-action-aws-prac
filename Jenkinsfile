@@ -130,63 +130,63 @@ pipeline {
             }
         }
         
-        stage("Deploy To ECR And ECS"){
-            // Corrected syntax for Declarative Pipeline input block
-            input {
-                message "Are We Good To Deploy To Production"
-                ok "Proceed to Deploy"
-            }
-            steps {
-                echo "Deployment approved by user."
-            }
-        }
+        // stage("Deploy To ECR And ECS"){
+        //     // Corrected syntax for Declarative Pipeline input block
+        //     input {
+        //         message "Are We Good To Deploy To Production"
+        //         ok "Proceed to Deploy"
+        //     }
+        //     steps {
+        //         echo "Deployment approved by user."
+        //     }
+        // }
         
-        stage('Docker Login to AWS ECR') {
-            steps { // Fixed formatting and misplaced bracket here
-                script {
-                    sh "aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 102512866166.dkr.ecr.us-east-2.amazonaws.com"
-                }
-            }
-        }
+        // stage('Docker Login to AWS ECR') {
+        //     steps { // Fixed formatting and misplaced bracket here
+        //         script {
+        //             sh "aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 102512866166.dkr.ecr.us-east-2.amazonaws.com"
+        //         }
+        //     }
+        // }
 
         
-        stage('Push Image to Amazon ECR') {
-            steps {
-                script {
-                    sh "docker push ${IMAGE_URI}:${IMAGE_TAG}"
-                    sh "docker push ${IMAGE_URI}:latest"
-                }
-            }
-        }
+        // stage('Push Image to Amazon ECR') {
+        //     steps {
+        //         script {
+        //             sh "docker push ${IMAGE_URI}:${IMAGE_TAG}"
+        //             sh "docker push ${IMAGE_URI}:latest"
+        //         }
+        //     }
+        // }
 
-        stage('Removing The Local Docker Image'){
-            steps{
-                sh 'docker image rm ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}'
-                sh 'docker image rm ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest'
-                sh "docker rmi ${ECR_REPO_NAME}:${IMAGE_TAG} || true"
-                sh "docker rmi ${IMAGE_URI}:${IMAGE_TAG} || true"
-                sh "docker rmi ${IMAGE_URI}:latest || true"
-            }
-        }
+        // stage('Removing The Local Docker Image'){
+        //     steps{
+        //         sh 'docker image rm ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}'
+        //         sh 'docker image rm ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest'
+        //         sh "docker rmi ${ECR_REPO_NAME}:${IMAGE_TAG} || true"
+        //         sh "docker rmi ${IMAGE_URI}:${IMAGE_TAG} || true"
+        //         sh "docker rmi ${IMAGE_URI}:latest || true"
+        //     }
+        // }
 
-        stage('Deploy to Amazon ECS') {
-            environment {
-                AWS_DEFAULT_REGION = 'us-east-2'
-                ECS_CLUSTER_NAME   = 'superb-gecko-tukddh'
-                ECS_SERVICE_NAME   = 'spc-jenkins-cicd-service-les28lsx'
-            }
-            steps {
-                script {
-                    sh """
-                        aws ecs update-service \
-                            --cluster ${ECS_CLUSTER_NAME} \
-                            --service ${ECS_SERVICE_NAME} \
-                            --force-new-deployment \
-                            --region ${AWS_DEFAULT_REGION}
-                    """
-                }
-            }
-        }
+        // stage('Deploy to Amazon ECS') {
+        //     environment {
+        //         AWS_DEFAULT_REGION = 'us-east-2'
+        //         ECS_CLUSTER_NAME   = 'superb-gecko-tukddh'
+        //         ECS_SERVICE_NAME   = 'spc-jenkins-cicd-service-les28lsx'
+        //     }
+        //     steps {
+        //         script {
+        //             sh """
+        //                 aws ecs update-service \
+        //                     --cluster ${ECS_CLUSTER_NAME} \
+        //                     --service ${ECS_SERVICE_NAME} \
+        //                     --force-new-deployment \
+        //                     --region ${AWS_DEFAULT_REGION}
+        //             """
+        //         }
+        //     }
+        // }
     }
 
     post {
