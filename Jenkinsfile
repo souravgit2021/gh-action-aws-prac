@@ -109,7 +109,7 @@ pipeline {
             steps {
                 script {
                     sh "ls -l"
-                    sh "sed -i 's|IMAGE_PLACEHOLDER|${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}|' deployment.yaml"
+                    sh "sed -i 's|^.*- name: springapp.*$|&\\n        image: ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}|' deployment.yaml"
                 }
             }
         }
