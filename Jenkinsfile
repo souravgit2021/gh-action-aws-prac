@@ -150,6 +150,7 @@ pipeline {
         stage('Build ECR Docker Image') { 
             steps {
                 script {
+                    sh "pwd;ls -l"
                     sh "docker build -t ${ECR_REPO_NAME}:${IMAGE_TAG} ."
                 }
             }
