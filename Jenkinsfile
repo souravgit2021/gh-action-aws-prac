@@ -8,17 +8,16 @@ pipeline {
     environment {
         DOCKER_HUB_USER  = 'docsourav1992'
         IMAGE_NAME       = 'spring_pet_clinic'
-        IMAGE_TAG        = "${env.BUILD_NUMBER}" // Standardized single definition
+        IMAGE_TAG        = "${env.BUILD_NUMBER}" 
         DOCKER_CRED_ID   = 'docker-hub-credentials' 
         GITHUB_CREDS     = credentials('git-login')
         REPO_URL         = 'github.com/souravgit2021/gitops-springpetclinic.git'
         BRANCH           = 'main'
 
-        AWS_REGISTRY_ID  = '102512866166' // Your 12-digit AWS Account ID
-        AWS_REGION       = 'us-east-2'     // Your target AWS Region
-        ECR_REPO_NAME    = 'spc-app'       // Your Amazon ECR Repository Name
+        AWS_REGISTRY_ID  = '102512866166' 
+        AWS_REGION       = 'us-east-2'     
+        ECR_REPO_NAME    = 'spc-app'       
         
-        // Formulated Variables
         ECR_REGISTRY_URI = "${AWS_REGISTRY_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
         IMAGE_URI        = "${ECR_REGISTRY_URI}/${ECR_REPO_NAME}"
     }
@@ -62,7 +61,7 @@ pipeline {
            }
         }
 
-        stage('Build Docker Hub Image') { // Renamed to ensure uniqueness
+        stage('Build Docker Hub Image') { 
             steps {
                 script {
                     echo "Building image: ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
@@ -75,10 +74,7 @@ pipeline {
         stage('Trivy Security Scan') {
             steps {
                 script {
-                    // 1. Run a scan to print standard table output in the Jenkins console logs
                     sh "trivy image --severity HIGH,CRITICAL ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
-                    
-                    // 2. Optional: Generate a JSON report to archive as an artifact
                     sh "trivy image --format json --output trivy-report.json ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
                 }
             }
@@ -101,10 +97,8 @@ pipeline {
             }
         }
 
-        
         stage('Checkout Code For GitOps') {
             steps {
-                // Safely clones the repository using your credentials
                 git branch: "${BRANCH}", 
                     credentialsId: 'git-login', 
                     url: "https://${REPO_URL}"
@@ -115,7 +109,6 @@ pipeline {
             steps {
                 script {
                     sh "ls -l"
-                    // sh "sed -i 's|^.*image:.*\$|      image: ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}|' deployment.yaml"
                     sh "sed -i 's|IMAGE_PLACEHOLDER|${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}|' deployment.yaml"
                 }
             }
@@ -124,42 +117,39 @@ pipeline {
         stage('Push Changes to GitHub') {
             steps {
                 script {
-                    // Configure temporary git identity for the commit
                     sh "git config user.name 'Sourav Biswas'"
                     sh "git config user.email 'Sourav@mail.com'"
                     
-                    // Stage and commit the changed deployment file
                     sh "git add deployment.yaml"
                     sh "git commit -m 'automated deployment file update [skip ci]'"
                     
-                    // Push back to GitHub using securely injected credentials
                     sh "git push https://${GITHUB_CREDS_USR}:${GITHUB_CREDS_PSW}@${REPO_URL} HEAD:${BRANCH}"
                 }
             }
         }
         
-        
         stage("Deploy To ECR And ECS"){
+            // Corrected syntax for Declarative Pipeline input block
             input {
-                message: "Are We Good To Deploy To Production"
+                message "Are We Good To Deploy To Production"
+                ok "Proceed to Deploy"
+            }
+            steps {
+                echo "Deployment approved by user."
             }
         }
         
-        
         stage('Docker Login to AWS ECR') {
-            steps 
-               {
-                    script {
-                        sh "aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 102512866166.dkr.ecr.us-east-2.amazonaws.com"
-                    }
+            steps { // Fixed formatting and misplaced bracket here
+                script {
+                    sh "aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 102512866166.dkr.ecr.us-east-2.amazonaws.com"
                 }
             }
-        
+        }
 
-        stage('Build ECR Docker Image') { // Renamed to ensure uniqueness
+        stage('Build ECR Docker Image') { 
             steps {
                 script {
-                    // Builds the image locally using the current workspace context
                     sh "docker build -t ${ECR_REPO_NAME}:${IMAGE_TAG} ."
                 }
             }
@@ -168,7 +158,6 @@ pipeline {
          stage('Tag Docker Image') {
             steps {
                 script {
-                    // Tags local build with ECR naming patterns
                     sh "docker tag ${ECR_REPO_NAME}:${IMAGE_TAG} ${IMAGE_URI}:${IMAGE_TAG}"
                     sh "docker tag ${ECR_REPO_NAME}:${IMAGE_TAG} ${IMAGE_URI}:latest"
                 }
@@ -178,7 +167,6 @@ pipeline {
         stage('Push Image to Amazon ECR') {
             steps {
                 script {
-                    // Pushes both the build-versioned tag and the latest tag to ECR
                     sh "docker push ${IMAGE_URI}:${IMAGE_TAG}"
                     sh "docker push ${IMAGE_URI}:latest"
                 }
@@ -195,39 +183,29 @@ pipeline {
             }
         }
 
-        
-
-
-
         stage('Deploy to Amazon ECS') {
-    environment {
-        AWS_DEFAULT_REGION = 'us-east-2'
-        ECS_CLUSTER_NAME   = 'superb-gecko-tukddh'
-        ECS_SERVICE_NAME   = 'spc-jenkins-cicd-service-4iz15544'
-    }
-    steps {
-        script {
-            // Forces ECS to pull the latest image and perform a rolling update
-            sh """
-                aws ecs update-service \
-                    --cluster ${ECS_CLUSTER_NAME} \
-                    --service ${ECS_SERVICE_NAME} \
-                    --force-new-deployment \
-                    --region ${AWS_DEFAULT_REGION}
-            """
+            environment {
+                AWS_DEFAULT_REGION = 'us-east-2'
+                ECS_CLUSTER_NAME   = 'superb-gecko-tukddh'
+                ECS_SERVICE_NAME   = 'spc-jenkins-cicd-service-4iz15544'
+            }
+            steps {
+                script {
+                    sh """
+                        aws ecs update-service \
+                            --cluster ${ECS_CLUSTER_NAME} \
+                            --service ${ECS_SERVICE_NAME} \
+                            --force-new-deployment \
+                            --region ${AWS_DEFAULT_REGION}
+                    """
                 }
             }
         }
-
-
-
-
     }
 
     post {
         always {
-            // Archive the generated scan report inside Jenkins
-            archiveArtifacts artifacts: 'trivy-report.json', allowEmptyArchive: true
+            cleanWs()
         }
     }
-}
+} // Fixed: Added final closing bracket for the pipeline
