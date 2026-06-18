@@ -1,0 +1,17 @@
+name: Spring_App_CI_CD
+on: workflow_dispatch
+
+jobs:
+  CI_Job:
+     runs-on: ubuntu-latest
+     steps:
+        - name: Code Check Out
+          uses: actions/checkout@v4
+        
+        - name: Code Testing Local
+          run: mvn test
+
+        - name: Build and Analyze
+          env:
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
