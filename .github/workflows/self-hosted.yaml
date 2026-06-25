@@ -13,3 +13,6 @@ jobs:
 
       - name: Run a build script
         run: echo "Running on my own custom infrastructure!"
+
+      - name: Printing HostName
+        run: hostnamectl
